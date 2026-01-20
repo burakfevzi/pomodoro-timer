@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pomodoro Timer</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #0D0D0D, #161616, #0D0D0D);
+            color: white;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+        .timer {
+            font-size: 4rem;
+            font-weight: 100;
+            margin: 20px 0;
+            color: #FF6B6B;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+        .status {
+            font-size: 1.2rem;
+            margin: 10px 0;
+            opacity: 0.8;
+        }
+        .button {
+            background: #FF6B6B;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+        .break {
+            color: #4ECDC4 !important;
+            text-shadow: 0 0 20px rgba(78, 205, 196, 0.5) !important;
+        }
+        .break .button {
+            background: #4ECDC4;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🍅 Pomodoro Timer</h1>
+        <div class="status" id="status">Odaklanma Zamanı</div>
+        <div class="timer" id="timer">25:00</div>
+        <button class="button" onclick="toggleTimer()" id="toggleBtn">Başlat</button>
+        <button class="button" onclick="resetTimer()">Sıfırla</button>
+        
+        <div style="margin-top: 30px; opacity: 0.6;">
+            <p>📱 iPhone'da Ana Ekrana Ekle</p>
+            <p>Native app gibi çalışır!</p>
+        </div>
+    </div>
+
+    <script>
+        let isRunning = false;
+        let isFocus = true;
+        let timeLeft = 25 * 60; // 25 dakika
+        let interval;
+
+        function updateDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+            
+            const container = document.querySelector('.container');
+            const status = document.getElementById('status');
+            
+            if (isFocus) {
+                container.classList.remove('break');
+                status.textContent = 'Odaklanma Zamanı';
+            } else {
+                container.classList.add('break');
+                status.textContent = 'Mola Zamanı';
+            }
+        }
+
+        function toggleTimer() {
+            const btn = document.getElementById('toggleBtn');
+            
+            if (isRunning) {
+                clearInterval(interval);
+                btn.textContent = 'Başlat';
+                isRunning = false;
+            } else {
+                interval = setInterval(() => {
+                    timeLeft--;
+                    updateDisplay();
+                    
+                    if (timeLeft <= 0) {
+                        // Süre bitti
+                        clearInterval(interval);
+                        isRunning = false;
+                        btn.textContent = 'Başlat';
+                        
+                        // Faz değiştir
+                        isFocus = !isFocus;
+                        timeLeft = isFocus ? 25 * 60 : 5 * 60;
+                        updateDisplay();
+                        
+                        // Bildirim
+                        alert(isFocus ? '🎉 Mola bitti! Odaklanma zamanı!' : '☕ Odaklanma tamamlandı! Mola zamanı!');
+                    }
+                }, 1000);
+                
+                btn.textContent = 'Durdur';
+                isRunning = true;
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(interval);
+            isRunning = false;
+            isFocus = true;
+            timeLeft = 25 * 60;
+            document.getElementById('toggleBtn').textContent = 'Başlat';
+            updateDisplay();
+        }
+
+        // İlk yükleme
+        updateDisplay();
+    </script>
+</body>
+</html>
